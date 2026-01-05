@@ -22,4 +22,10 @@ public interface StudentService {
 
 
     void deleteStudent(Long id);
+    
+    PagedResponseDTO<StudentResponseDTO> searchByName(
+            String name, int page, int size, String sort);
+
+    PagedResponseDTO<StudentResponseDTO> searchByEmail(
+            String email, int page, int size, String sort);
 }

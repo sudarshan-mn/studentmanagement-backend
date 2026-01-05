@@ -110,5 +110,25 @@ public class StudentController {
         studentService.deleteStudent(id);
         return "Student deleted with id: " + id;
     }
+    
+    @GetMapping("/search")
+    public PagedResponseDTO<StudentResponseDTO> searchStudents(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String email,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "id") String sort) {
+
+        if (name != null && !name.isBlank()) {
+            return studentService.searchByName(name, page, size, sort);
+        }
+
+        if (email != null && !email.isBlank()) {
+            return studentService.searchByEmail(email, page, size, sort);
+        }
+
+        throw new IllegalArgumentException("Provide either name or email to search");
+    }
+
 }
 

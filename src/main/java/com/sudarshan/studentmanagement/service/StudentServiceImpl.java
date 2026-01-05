@@ -19,7 +19,7 @@ import com.sudarshan.studentmanagement.repository.StudentRepository;
 
 @Service
 public class StudentServiceImpl implements StudentService {
-
+	
     @Autowired
     private StudentRepository studentRepository;
     @Override
@@ -108,4 +108,54 @@ public class StudentServiceImpl implements StudentService {
     public void deleteStudent(Long id) {
         studentRepository.deleteById(id);
     }
+    @Override
+    public PagedResponseDTO<StudentResponseDTO> searchByName(
+            String name, int page, int size, String sort) {
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
+        Page<Student> studentPage =
+                studentRepository.findByNameContainingIgnoreCase(name, pageable);
+
+        List<StudentResponseDTO> content = new ArrayList<>();
+        for (Student s : studentPage.getContent()) {
+            content.add(new StudentResponseDTO(
+                    s.getId(), s.getName(), s.getEmail(), s.getAge()));
+        }
+
+        return new PagedResponseDTO<>(
+                content,
+                studentPage.getNumber(),
+                studentPage.getTotalPages(),
+                studentPage.getTotalElements(),
+                studentPage.getSize(),
+                studentPage.isLast()
+        );
+    }
+
+    @Override
+    public PagedResponseDTO<StudentResponseDTO> searchByEmail(
+            String email, int page, int size, String sort) {
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
+        Page<Student> studentPage =
+                studentRepository.findByEmailContainingIgnoreCase(email, pageable);
+
+        List<StudentResponseDTO> content = new ArrayList<>();
+        for (Student s : studentPage.getContent()) {
+            content.add(new StudentResponseDTO(
+                    s.getId(), s.getName(), s.getEmail(), s.getAge()));
+        }
+
+        return new PagedResponseDTO<>(
+                content,
+                studentPage.getNumber(),
+                studentPage.getTotalPages(),
+                studentPage.getTotalElements(),
+                studentPage.getSize(),
+                studentPage.isLast()
+        );
+    }
+
 }
+
+
