@@ -3,6 +3,7 @@ package com.sudarshan.studentmanagement.security;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -25,8 +26,24 @@ public class SecurityConfig {
 	        )
 	        .authorizeHttpRequests(auth ->
 	            auth
+	                // PUBLIC APIs
 	                .requestMatchers("/api/auth/**").permitAll()
-	                .requestMatchers("/api/students/**").authenticated()
+
+	                // READ access → USER + ADMIN
+	                .requestMatchers(HttpMethod.GET, "/api/students/**")
+	                .hasAnyRole("USER", "ADMIN")
+
+	                // WRITE access → ADMIN only
+	                .requestMatchers(HttpMethod.POST, "/api/students/**")
+	                .hasRole("ADMIN")
+
+	                .requestMatchers(HttpMethod.PUT, "/api/students/**")
+	                .hasRole("ADMIN")
+
+	                .requestMatchers(HttpMethod.DELETE, "/api/students/**")
+	                .hasRole("ADMIN")
+
+	                // Everything else must be authenticated
 	                .anyRequest().authenticated()
 	        )
 	        .addFilterBefore(
@@ -36,6 +53,7 @@ public class SecurityConfig {
 
 	    return http.build();
 	}
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {
